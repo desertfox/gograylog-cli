@@ -3,7 +3,7 @@ module github.com/desertfox/gograylog-cli
 go 1.19
 
 require (
-	github.com/desertfox/gograylog v1.4.0
+	github.com/desertfox/gograylog v1.5.0
 	github.com/spf13/cobra v1.7.0
 	golang.org/x/term v0.11.0
 )

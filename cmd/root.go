@@ -21,6 +21,7 @@ func init() {
 
 	rootCmd.AddCommand(loginCmd)
 	rootCmd.AddCommand(searchCmd)
+	rootCmd.AddCommand(streamsCmd)
 
 }
 
