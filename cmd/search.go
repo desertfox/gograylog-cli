@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/desertfox/gograylog"
-	"github.com/desertfox/gograylog-cli/token"
+	"github.com/desertfox/gograylog-cli/util"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +18,7 @@ var (
 	searchCmd = &cobra.Command{
 		Use: "search",
 		Run: func(cmd *cobra.Command, args []string) {
-			h, t, err := token.ReadFromDisk(savePath)
+			h, t, err := util.ReadFromDisk(savePath)
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -38,7 +38,7 @@ var (
 				StreamID:    streamid,
 				QueryString: args[0],
 				Frequency:   frequency,
-				Fields:      []string{"source"}, //TODO
+				Fields:      []string{"message"}, //TODO
 				Limit:       limit,
 			}
 

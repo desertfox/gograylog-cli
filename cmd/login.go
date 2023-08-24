@@ -8,7 +8,7 @@ import (
 	"syscall"
 
 	"github.com/desertfox/gograylog"
-	"github.com/desertfox/gograylog-cli/token"
+	"github.com/desertfox/gograylog-cli/util"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 )
@@ -41,7 +41,7 @@ var (
 				os.Exit(1)
 			}
 
-			if err := token.SaveToDisk(c.Host, c.Token, savePath); err != nil {
+			if err := util.SaveToDisk(c.Host, c.Token, savePath); err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}

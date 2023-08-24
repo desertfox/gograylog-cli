@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/desertfox/gograylog"
-	"github.com/desertfox/gograylog-cli/token"
+	"github.com/desertfox/gograylog-cli/util"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +15,7 @@ var (
 	streamsCmd = &cobra.Command{
 		Use: "streams",
 		Run: func(cmd *cobra.Command, args []string) {
-			h, t, err := token.ReadFromDisk(savePath)
+			h, t, err := util.ReadFromDisk(savePath)
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -37,7 +37,13 @@ var (
 				os.Exit(1)
 			}
 
-			fmt.Println(string(b))
+			data, err := util.PrettyString(b)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
+			fmt.Println(data)
 		},
 	}
 )
