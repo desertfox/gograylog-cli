@@ -64,7 +64,6 @@ func init() {
 	searchCmd.PersistentFlags().IntVar(&frequency, "frequency", 900, "search frequency in seconds")
 	searchCmd.PersistentFlags().IntVar(&limit, "limit", 10000, "limit of messages to return")
 	searchCmd.PersistentFlags().StringVar(&fields, "fields", "timestamp,message", "csv header fields to be returned")
-	searchCmd.PersistentFlags().StringVar(&fields, "fields", "timestamp,message", "csv header fields to be returned")
 	searchCmd.PersistentFlags().BoolVar(&quiet, "quiet", false, "suppress extra info")
 	loginCmd.MarkPersistentFlagRequired("streamid")
 }
