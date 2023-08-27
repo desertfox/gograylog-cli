@@ -1,9 +1,7 @@
 package cmd
 
 import (
-	"crypto/tls"
 	"fmt"
-	"net/http"
 	"os"
 	"syscall"
 
@@ -26,14 +24,10 @@ var (
 				os.Exit(1)
 			}
 
-			c := gograylog.Client{
-				Host: host,
-				HttpClient: &http.Client{
-					Transport: &http.Transport{
-						TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-					},
-				},
-			}
+			c := util.BuildClient(util.Session{
+				Host:    host,
+				Session: gograylog.Session{},
+			})
 
 			err = c.Login(username, string(bytepw))
 			if err != nil {
@@ -41,7 +35,7 @@ var (
 				os.Exit(1)
 			}
 
-			if err := util.SaveToDisk(c.Host, c.Token, savePath); err != nil {
+			if err := util.SaveToDisk(savePath, host, *c.Session); err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}

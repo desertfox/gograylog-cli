@@ -1,13 +1,12 @@
 package cmd
 
 import (
-	"crypto/tls"
+	"bytes"
+	"encoding/csv"
 	"fmt"
-	"net/http"
 	"os"
 	"strings"
 
-	"github.com/desertfox/gograylog"
 	"github.com/desertfox/gograylog-cli/util"
 	"github.com/spf13/cobra"
 )
@@ -17,6 +16,7 @@ var (
 	frequency int
 	limit     int
 	fields    string
+	quiet     bool
 	searchCmd = &cobra.Command{
 		Use:   "search",
 		Short: "search --flag value \"graylog search query\"",
@@ -26,29 +26,14 @@ var (
 				os.Exit(1)
 
 			}
-			h, t, err := util.ReadFromDisk(savePath)
+			s, err := util.ReadFromDisk(savePath)
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
+			c := util.BuildClient(s)
 
-			c := gograylog.Client{
-				Host:  h,
-				Token: t,
-				HttpClient: &http.Client{
-					Transport: &http.Transport{
-						TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-					},
-				},
-			}
-
-			q := gograylog.Query{
-				StreamID:    streamid,
-				QueryString: args[0],
-				Frequency:   frequency,
-				Fields:      strings.Split(fields, ","),
-				Limit:       limit,
-			}
+			q := util.BuildQuery(streamid, args[0], frequency, strings.Split(fields, ","), limit)
 
 			b, err := c.Search(q)
 			if err != nil {
@@ -57,6 +42,19 @@ var (
 			}
 
 			fmt.Println(string(b))
+			records, err := csv.NewReader(bytes.NewBuffer(b)).ReadAll()
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
+			if !quiet {
+				fmt.Printf("Count: %d\n", len(records))
+				if len(records) > 0 {
+					fmt.Printf("First record: %s\n", records[1][:])
+					fmt.Printf("Last  record: %s\n", records[len(records)-1][:])
+				}
+			}
 		},
 	}
 )
@@ -66,5 +64,7 @@ func init() {
 	searchCmd.PersistentFlags().IntVar(&frequency, "frequency", 900, "search frequency in seconds")
 	searchCmd.PersistentFlags().IntVar(&limit, "limit", 10000, "limit of messages to return")
 	searchCmd.PersistentFlags().StringVar(&fields, "fields", "timestamp,message", "csv header fields to be returned")
+	searchCmd.PersistentFlags().StringVar(&fields, "fields", "timestamp,message", "csv header fields to be returned")
+	searchCmd.PersistentFlags().BoolVar(&quiet, "quiet", false, "suppress extra info")
 	loginCmd.MarkPersistentFlagRequired("streamid")
 }

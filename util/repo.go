@@ -1,25 +1,40 @@
 package util
 
 import (
-	"fmt"
+	"encoding/json"
 	"os"
-	"strings"
+
+	"github.com/desertfox/gograylog"
 )
 
-func SaveToDisk(host, token, path string) error {
-	str := fmt.Sprintf("%v\n%v", host, token)
+type Session struct {
+	Host    string            `json:"host"`
+	Session gograylog.Session `json:"session"`
+}
 
-	err := os.WriteFile(path, []byte(str), 0644)
+func SaveToDisk(path, host string, session gograylog.Session) error {
+	cliSession := Session{host, session}
+
+	b, err := json.Marshal(cliSession)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(path, b, 0644)
+	if err != nil {
+		return err
+	}
 
 	return err
 }
 
-func ReadFromDisk(path string) (string, string, error) {
+func ReadFromDisk(path string) (Session, error) {
 	file, err := os.ReadFile(path)
 	if err != nil {
-		return "", "", err
+		return Session{}, err
 	}
-	data := strings.Split(string(file), "\n")
+	var session Session
+	err = json.Unmarshal(file, &session)
 
-	return data[0], data[1], nil
+	return session, nil
 }
